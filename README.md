@@ -1,9 +1,8 @@
+vscode
 ```
-//vscode
 node server.js
 ```
-
-```
 //eclipse
-run WsApplication
+```
+run as WsApplication
 ```
