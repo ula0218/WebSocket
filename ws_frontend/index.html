@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
+  <link rel="stylesheet" href="styles.css"> <!-- 連結外部 CSS 文件 -->
+</head>
+<body>
+  <div class="container">
+    <h1>WebSocket Chat</h1>
+    <div id="messages"></div>
+    <input id="messageInput" type="text" placeholder="Enter message">
+    <button onclick="sendMessage()">Send Message</button>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+      displayMessage('WebSocket connection opened');
+    };
+
+    ws.onmessage = (event) => {
+      if (event.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          console.log('Message received:', reader.result);
+          displayMessage('Received: ' + reader.result);
+        };
+        reader.readAsText(event.data);
+      } else {
+        console.log('Message received:', event.data);
+        displayMessage('Received: ' + event.data);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      displayMessage('WebSocket error: ' + error.message);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+      displayMessage('WebSocket connection closed');
+    };
+
+    function sendMessage() {
+      const message = document.getElementById('messageInput').value;
+      if (message.trim()) {
+        ws.send(message);
+        displayMessage('Sent: ' + message);
+        document.getElementById('messageInput').value = ''; // Clear input field
+      }
+    }
+
+    function displayMessage(message) {
+      const messages = document.getElementById('messages');
+      messages.textContent += message + '\n';
+      messages.scrollTop = messages.scrollHeight; // Scroll to bottom
+    }
+  </script>
+</body>
+</html>
+
